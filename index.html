@@ -1623,15 +1623,19 @@ if(!matchMedia('(hover:none),(pointer:coarse)').matches) addEventListener('mouse
 
 /* ================= BOOT ================= */
 clUpdate(); adSelect(2); asSelect(0); fmSet(0); crSelect(0); stopCr(); adI=-1; crI=-1; renderCrList('all');
+try{ gsap.ticker.lagSmoothing(0); }catch(e){}
+let entered=false;
+const reveal=()=>{ if(entered) return; entered=true; if(deck){ setActive(cur); enter(cur,0); } };
 const boot=()=>{
   setMode();
+  setTimeout(()=>{ const L=$('#loader'); if(L.style.display!=='none'){ L.style.display='none'; reveal(); gsap.set('.top, .nav, .dots, .hint',{opacity:1}); } },3800);
   if(deck) $$('[data-a]').forEach(el=>{ if(!el.closest('.scene.on')) gsap.set(el,{opacity:0}); });
   const cnt=$('#lCnt'), bar=$('#lBar'), o={v:0};
   gsap.timeline()
     .to(o,{v:100,duration:reduce?.1:1.3,ease:'power2.inOut',onUpdate:()=>{cnt.innerHTML=String(Math.round(o.v)).padStart(3,'0')+'<small>%</small>'; bar.style.transform=`scaleX(${o.v/100})`;}})
     .to('#loader',{clipPath:'inset(0 0 100% 0)',duration:reduce?.1:.9,ease:'expo.inOut'},'+=.1')
     .set('#loader',{display:'none'})
-    .add(()=>{ if(deck){ setActive(cur); enter(cur,0); } },'-=.45')
+    .add(reveal,'-=.45')
     .from('.top, .nav, .dots, .hint',{opacity:0,duration:.8,stagger:.06,clearProps:'opacity'},'-=.3');
   FX.setShape(scenes[cur].dataset.shape||'sayt');
 };
